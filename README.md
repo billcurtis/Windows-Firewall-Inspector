@@ -36,6 +36,7 @@ The project consists of three programs that work together in a pipeline: **colle
 |---|---|---|
 | **Firewall Log Agent** | `FirewallAgent/FirewallLogAgent.ps1` | Interactive GUI or headless agent that enables firewall logging, resolves processes, and uploads entries to Azure Table Storage in real time. |
 | **Firewall Log Collector** | `FirewallAgent/FirewallLogCollector.ps1` | Standalone script for local or remote VMs — writes firewall logs to date-stamped CSV files. Can be deployed as a scheduled task or run via `Invoke-AzVMRunCommand`. |
+| **Collector Installer** | `FirewallAgent/FirewallLogCollectorInstaller.ps1` | Install/uninstall-only wrapper for Azure Run Command. Deploys a self-contained scheduled task collector without exposing the other collector actions. |
 | **Firewall Log Viewer** | `FirewallViewer/FirewallLogViewer.ps1` | Dark-mode WPF dashboard — queries Azure Table Storage or loads CSV files, filters/sorts data, charts activity, looks up IP owners, and exports to CSV. |
 
 ---
@@ -140,6 +141,12 @@ Invoke-AzVMRunCommand -ResourceGroupName 'rg' -VMName 'vm' `
 Invoke-AzVMRunCommand -ResourceGroupName 'rg' -VMName 'vm' `
     -CommandId 'RunPowerShellScript' `
     -ScriptPath '.\FirewallAgent\FirewallLogCollector.ps1' `
+    -Parameter @{ Action = 'Install'; IntervalSeconds = '30' }
+
+# Install the scheduled task using the install/uninstall-only wrapper
+Invoke-AzVMRunCommand -ResourceGroupName 'rg' -VMName 'vm' `
+    -CommandId 'RunPowerShellScript' `
+    -ScriptPath '.\FirewallAgent\FirewallLogCollectorInstaller.ps1' `
     -Parameter @{ Action = 'Install'; IntervalSeconds = '30' }
 ```
 
